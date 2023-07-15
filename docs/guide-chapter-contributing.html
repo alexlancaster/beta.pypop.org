@@ -1,0 +1,711 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>4. Contributing to PyPop &#8212; PyPop: Python for Population Genomics 1.0.0a27 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic_mod.css?v=0.7.0-1" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/js/theme.js"></script>
+    <script src="../_static/js/petite-vue.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5. Installation instructions for old 0.7.0 binaries" href="guide-chapter-install-obsolete.html" />
+    <link rel="prev" title="3. Interpreting PyPop output" href="guide-chapter-instructions.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+        <div id="notification_banner" data-banner-hiding="temporary" v-show="!permanentlyHidden">
+    <p v-if="visible" id="content">PyPop 0.7.0 binaries are deprecated, please check the <a href="https://github.com/alexlancaster/pypop#readme">README</a> for installing pre-releases or for compiling from source</p>
+    <a class="close" href="#" @click.prevent="toggleVisible()">[[ visible ? '&#x25B2; HIDE' : '&#x25BC; SHOW BANNER' ]]</a>
+</div>
+
+<script>
+(function() {
+    const topNav = document.querySelector('#top_nav')
+    const notificationContent = document.querySelector('#notification_banner p#content').innerText
+    const localStorageKey = 'readNotification'
+    const bannerHiding = document.querySelector('#notification_banner').dataset['bannerHiding']
+    const cssVariableName = '--navbarHeight'
+    const rootElement = document.documentElement
+
+    /*************************************************************************/
+    // Local storage for remembering if the user has read the notification.
+
+    function checkAlreadyRead() {
+        return localStorage.getItem(localStorageKey) == notificationContent
+    }
+
+    function setRead() {
+        localStorage.setItem(localStorageKey, notificationContent)
+    }
+
+    function clearRead() {
+        localStorage.removeItem(localStorageKey)
+    }
+
+    const alreadyRead = checkAlreadyRead()
+    const permanentlyHidden = alreadyRead && bannerHiding == 'permanent'
+
+    /*************************************************************************/
+    // Updating a CSS variable so other elements adjust to the nav bar height.
+
+    function updateNavbarHeight() {
+        // Only update it if the delta is significant. Otherwise it causes
+        // unnecessary browser repaints.
+        const documentStyles = getComputedStyle(rootElement)
+        // We store the value in REM, so need to convert to pixels
+        const currentValue = parseFloat(
+            documentStyles.getPropertyValue(cssVariableName)
+        ) * parseFloat(documentStyles.fontSize)
+
+        const newValue = topNav.clientHeight
+
+        if (newValue - 5 > currentValue) {
+            console.log(`Updating ${cssVariableName} - overlapping`)
+            rootElement.style.setProperty(
+                cssVariableName, newValue + "px"
+            );
+        } else if (currentValue - newValue >= 30) {
+            console.log(`Updating ${cssVariableName} - gap too large`)
+            rootElement.style.setProperty(
+                cssVariableName, newValue + "px"
+            );
+        }
+    }
+
+    /*************************************************************************/
+    // After loading the page, and resizing the window, recalculate the nav bar
+    // height.
+
+    if (!permanentlyHidden) {
+        // This height is approximately correct when there's a banner, so
+        // shouldn't require any page reflow:
+        rootElement.style.setProperty(
+            '--navbarHeight', "5.5rem"
+        );
+
+        document.addEventListener("DOMContentLoaded", function() {
+            updateNavbarHeight()
+        });
+
+        var interval = undefined
+
+        window.addEventListener('resize', () => {
+            if (interval) {
+                clearTimeout(interval)
+            }
+            interval = setTimeout(() => {
+                console.log("Finished resizing")
+                updateNavbarHeight()
+            }, 100)
+        })
+    }
+
+    /*************************************************************************/
+
+    PetiteVue.createApp({
+        visible: !alreadyRead,
+        permanentlyHidden: permanentlyHidden,
+        bannerHiding: bannerHiding,
+        $delimiters: ['[[', ']]'],
+        toggleVisible() {
+            this.visible = !this.visible
+
+            if (this.visible) {
+                clearRead()
+            } else {
+                setRead()
+            }
+
+            if (!this.visible && bannerHiding == 'permanent') {
+                this.permanentlyHidden = true
+            }
+
+            // Run this after Vue has had time to update the DOM:
+            setTimeout(
+                updateNavbarHeight,
+                0
+            )
+        }
+    }).mount('#notification_banner')
+})()
+</script>
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="../index.html" title="Go to homepage">PyPop</a></h1>
+            <a id="source_link" href="https://github.com/alexlancaster/pypop/">
+    
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512">
+            <path fill="white" d="M 244.8,8 C 106.1,8 0,113.3 0,252 c 0,110.9 69.8,205.8 169.5,239.2 12.8,2.3 17.3,-5.6 17.3,-12.1 0,-6.2 -0.3,-40.4 -0.3,-61.4 0,0 -70,15 -84.7,-29.8 0,0 -11.4,-29.1 -27.8,-36.6 0,0 -22.9,-15.7 1.6,-15.4 0,0 24.9,2 38.6,25.8 21.9,38.6 58.6,27.5 72.9,20.9 2.3,-16 8.8,-27.1 16,-33.7 -55.9,-6.2 -112.3,-14.3 -112.3,-110.5 0,-27.5 7.6,-41.3 23.6,-58.9 -2.6,-6.5 -11.1,-33.3 2.6,-67.9 20.9,-6.5 69,27 69,27 20,-5.6 41.5,-8.5 62.8,-8.5 21.3,0 42.8,2.9 62.8,8.5 0,0 48.1,-33.6 69,-27 13.7,34.7 5.2,61.4 2.6,67.9 16,17.7 25.8,31.5 25.8,58.9 0,96.5 -58.9,104.2 -114.8,110.5 9.2,7.9 17,22.9 17,46.4 0,33.7 -0.3,75.4 -0.3,83.6 0,6.5 4.6,14.4 17.3,12.1 C 428.2,457.8 496,362.9 496,252 496,113.3 383.5,8 244.8,8 Z"/>
+        </svg>
+    
+</a>
+        
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="../search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">PyPop User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="guide-chapter-install.html">1. Installing PyPop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide-chapter-usage.html">2. Getting started with PyPop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide-chapter-instructions.html">3. Interpreting PyPop output</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4. Contributing to PyPop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide-chapter-install-obsolete.html">5. Installation instructions for old 0.7.0 binaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide-chapter-changes.html">6. Authors and history</a></li>
+<li class="toctree-l2"><a class="reference internal" href="licenses.html">7. Licenses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biblio.html">8. References</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supplementary data sets</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="http://pypop.org/popdata/">Solberg et al. (2008)</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="contributing-to-pypop">
+<h1><span class="section-number">4. </span>Contributing to PyPop<a class="headerlink" href="#contributing-to-pypop" title="Permalink to this heading">¶</a></h1>
+<p>Contributions are welcome, and they are greatly appreciated! Every
+little bit helps, and credit will always be given. You can contribute
+from the scope of an user or as a core Python developer.</p>
+<section id="reporting-and-requesting">
+<h2><span class="section-number">4.1. </span>Reporting and Requesting<a class="headerlink" href="#reporting-and-requesting" title="Permalink to this heading">¶</a></h2>
+<section id="did-you-find-a-bug">
+<h3><span class="section-number">4.1.1. </span>Did you find a bug?<a class="headerlink" href="#did-you-find-a-bug" title="Permalink to this heading">¶</a></h3>
+<p>When <a class="reference external" href="https://github.com/alexlancaster/pypop/issues">reporting a bug</a> please use one of
+the provided issue templates if applicable, otherwise just start a
+blank issue and describe your situation.</p>
+<ul class="simple">
+<li><p>Ensure the bug was not already reported by searching on GitHub under
+<a class="reference external" href="https://github.com/alexlancaster/pypop/issues">Issues</a>.</p></li>
+<li><p>If you’re unable to find an open issue addressing the problem, open
+a new one. Be sure to include a title and clear description, as much
+relevant information as possible, and a code sample or an executable
+test case demonstrating the expected behavior that is not occurring.</p></li>
+<li><p>If possible, use the relevant bug report templates to create the issue.</p></li>
+</ul>
+</section>
+<section id="documentation-improvements">
+<h3><span class="section-number">4.1.2. </span>Documentation improvements<a class="headerlink" href="#documentation-improvements" title="Permalink to this heading">¶</a></h3>
+<p><strong>pypop</strong> could always use more documentation, whether as part of the
+official docs, in docstrings, or even on the web in blog posts,
+articles, and such. Write us a <a class="reference external" href="https://github.com/alexlancaster/pypop/issues/new?assignees=joaomcteixeira&amp;labels=documentation&amp;template=documentation.md&amp;title=%5BDOCUMENTATION%5D">documentation issue</a> describing what you
+would like to see improved in here, and, if you can do
+it, just <a class="reference external" href="https://github.com/alexlancaster/pypop/pulls">Pull Request</a> your proposed updates <code class="docutils literal notranslate"><span class="pre">:-)</span></code>.</p>
+</section>
+<section id="feature-requests-and-feedback">
+<h3><span class="section-number">4.1.3. </span>Feature requests and feedback<a class="headerlink" href="#feature-requests-and-feedback" title="Permalink to this heading">¶</a></h3>
+<p>The best way to send feedback is to file an issue using the <a class="reference external" href="https://github.com/alexlancaster/pypop/issues/new?assignees=joaomcteixeira&amp;labels=enhancement&amp;template=feature_request.md&amp;title=%5BFEATURE%5D">feature template</a>.</p>
+<p>If you are proposing a feature:</p>
+<ul class="simple">
+<li><p>Explain in detail how it would work.</p></li>
+<li><p>Keep the scope as narrow as possible, to make it easier to implement.</p></li>
+<li><p>Remember that this is a volunteer-driven project, and that code contributions are welcome</p></li>
+</ul>
+</section>
+</section>
+<section id="code-development">
+<h2><span class="section-number">4.2. </span>Code Development<a class="headerlink" href="#code-development" title="Permalink to this heading">¶</a></h2>
+<section id="general-instructions">
+<h3><span class="section-number">4.2.1. </span>General instructions<a class="headerlink" href="#general-instructions" title="Permalink to this heading">¶</a></h3>
+</section>
+</section>
+<section id="installation-for-developers">
+<h2><span class="section-number">4.3. </span>Installation for developers<a class="headerlink" href="#installation-for-developers" title="Permalink to this heading">¶</a></h2>
+<p>There are four main steps to the developer installation:</p>
+<ol class="arabic simple">
+<li><p>install a build environment</p></li>
+<li><p>clone the repository</p></li>
+<li><p>build</p></li>
+<li><p>run tests</p></li>
+</ol>
+<p>For most casual users and developers, we recommend using the miniconda
+approach described below.</p>
+<section id="install-the-build-environment">
+<h3><span class="section-number">4.3.1. </span>Install the build environment<a class="headerlink" href="#install-the-build-environment" title="Permalink to this heading">¶</a></h3>
+<p>To install the build environment, you should choose either <code class="docutils literal notranslate"><span class="pre">conda</span></code> or
+system packages. Once you have chosen and installed the build
+environment, you should follow the instructions related to the option
+you chose here in all subsequent steps.</p>
+<section id="install-build-environment-via-miniconda-recommended">
+<h4>Install build environment via miniconda (recommended)<a class="headerlink" href="#install-build-environment-via-miniconda-recommended" title="Permalink to this heading">¶</a></h4>
+<ol class="arabic">
+<li><p>Visit <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">https://docs.conda.io/en/latest/miniconda.html</a> to download the
+miniconda installer for your platform, and follow the instructions to
+install.</p>
+<blockquote>
+<div><p>In principle, the rest of the PyPop miniconda installation process
+should work on any platform that is supported by miniconda, but
+only Linux and MacOS have been tested in standalone mode, at this
+time.</p>
+</div></blockquote>
+</li>
+<li><p>Once miniconda is installed, create a new conda environment, using
+the following commands:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>pypop3<span class="w"> </span>gsl<span class="w"> </span>swig<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>
+</pre></div>
+</div>
+<p>This will download and create a self-contained build-environment that
+uses of Python to the system-installed one, along with other
+requirements. You will need to use this this environment for the
+build, installation and running of PyPop. The conda environment name,
+above, <code class="docutils literal notranslate"><span class="pre">pypop3</span></code>, can be replaced with your own name.</p>
+<blockquote>
+<div><p>When installing on MacOS, before installing <code class="docutils literal notranslate"><span class="pre">conda</span></code>, you should
+first to ensure that the Apple Command Line Developer Tools
+(XCode) are
+<a class="reference external" href="https://mac.install.guide/commandlinetools/4.html">installed</a>,
+so you have the compiler (<code class="docutils literal notranslate"><span class="pre">clang</span></code>, the drop-in replacement for
+<code class="docutils literal notranslate"><span class="pre">gcc</span></code>), <code class="docutils literal notranslate"><span class="pre">git</span></code> etc. <code class="docutils literal notranslate"><span class="pre">conda</span></code> is unable to include the full
+development environment for <code class="docutils literal notranslate"><span class="pre">clang</span></code> as a conda package for legal
+reasons.</p>
+</div></blockquote>
+</li>
+<li><p>Activate the environment, and set environments variables needed for
+compilation:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>pypop3
+conda<span class="w"> </span>env<span class="w"> </span>config<span class="w"> </span>vars<span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="nv">CPATH</span><span class="o">=</span><span class="si">${</span><span class="nv">CONDA_PREFIX</span><span class="si">}</span>/include:<span class="si">${</span><span class="nv">CPATH</span><span class="si">}</span>
+conda<span class="w"> </span>env<span class="w"> </span>config<span class="w"> </span>vars<span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="nv">LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">CONDA_PREFIX</span><span class="si">}</span>/lib:<span class="si">${</span><span class="nv">LIBRARY_PATH</span><span class="si">}</span>
+conda<span class="w"> </span>env<span class="w"> </span>config<span class="w"> </span>vars<span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">CONDA_PREFIX</span><span class="si">}</span>/lib:<span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>To ensure that the environment variables are saved, reactivate the
+environment:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>pypop3
+</pre></div>
+</div>
+</li>
+<li><p>Skip ahead to <a class="reference internal" href="#clone-the-repository">Clone the repository</a></p></li>
+</ol>
+</section>
+<section id="install-build-environment-via-system-packages-advanced">
+<h4>Install build environment via system packages (advanced)<a class="headerlink" href="#install-build-environment-via-system-packages-advanced" title="Permalink to this heading">¶</a></h4>
+<section id="unix-linux">
+<h5>Unix/Linux:<a class="headerlink" href="#unix-linux" title="Permalink to this heading">¶</a></h5>
+<ol class="arabic">
+<li><p>Ensure Python 3 version of <code class="docutils literal notranslate"><span class="pre">pip</span></code> is installed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">ensurepip</span> <span class="o">--</span><span class="n">user</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">default</span><span class="o">-</span><span class="n">pip</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Note the use of the <code class="docutils literal notranslate"><span class="pre">python3</span></code> - you may find this to be
+necessary on systems which parallel-install both Python 2 and 3,
+which is typically the case. On newer systems you may find that
+<code class="docutils literal notranslate"><span class="pre">python</span></code> and <code class="docutils literal notranslate"><span class="pre">pip</span></code> are, by default, the Python 3 version of
+those tools.</p>
+</div></blockquote>
+</li>
+<li><p>Install packages system-wide:</p>
+<ol class="arabic">
+<li><p>Fedora/Centos/RHEL</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">dnf</span> <span class="n">install</span> <span class="n">git</span> <span class="n">swig</span> <span class="n">gsl</span><span class="o">-</span><span class="n">devel</span> <span class="n">python3</span><span class="o">-</span><span class="n">devel</span>
+</pre></div>
+</div>
+</li>
+<li><p>Ubuntu</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">git</span> <span class="n">swig</span> <span class="n">libgsl</span><span class="o">-</span><span class="n">dev</span> <span class="n">python</span><span class="o">-</span><span class="n">setuptools</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</li>
+</ol>
+</section>
+<section id="macos-x">
+<h5>MacOS X<a class="headerlink" href="#macos-x" title="Permalink to this heading">¶</a></h5>
+<ol class="arabic">
+<li><p>Install developer command-line tools:
+<a class="reference external" href="https://developer.apple.com/downloads/">https://developer.apple.com/downloads/</a> (includes <code class="docutils literal notranslate"><span class="pre">git</span></code>, <code class="docutils literal notranslate"><span class="pre">gcc</span></code>)</p></li>
+<li><p>Visit <a class="reference external" href="http://macports.org">http://macports.org</a> and follow the instructions there to
+install the latest version of MacPorts for your version of MacOS X.</p></li>
+<li><p>Set environment variables to use macports version of Python and other
+packages, packages add the following to <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/opt/local/bin:<span class="nv">$PATH</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LIBRARY_PATH</span><span class="o">=</span>/opt/local/lib/:<span class="nv">$LIBRARY_PATH</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">CPATH</span><span class="o">=</span>/opt/local/include:<span class="nv">$CPATH</span>
+</pre></div>
+</div>
+</li>
+<li><p>Rerun your bash shell login in order to make these new exports active
+in your environment. At the command line type:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">exec</span><span class="w"> </span>bash<span class="w"> </span>-login
+</pre></div>
+</div>
+</li>
+<li><p>Install dependencies via MacPorts and set Python version to use
+(FIXME: currently untested!)</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>port<span class="w"> </span>install<span class="w"> </span>swig-python<span class="w"> </span>gsl<span class="w"> </span>py39-numpy<span class="w"> </span>py39-lxml<span class="w"> </span>py39-setuptools<span class="w"> </span>py39-pip<span class="w"> </span>py39-pytest
+sudo<span class="w"> </span>port<span class="w"> </span><span class="k">select</span><span class="w"> </span>--set<span class="w"> </span>python<span class="w"> </span>python39
+sudo<span class="w"> </span>port<span class="w"> </span><span class="k">select</span><span class="w"> </span>--set<span class="w"> </span>pip<span class="w"> </span>pip39
+</pre></div>
+</div>
+</li>
+<li><p>Check that the MacPorts version of Python is active by typing:
+<code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">python</span></code>, if it is working correctly you should see
+<code class="docutils literal notranslate"><span class="pre">/opt/local/bin/python</span></code>.</p></li>
+</ol>
+</section>
+</section>
+<section id="windows">
+<h4>Windows<a class="headerlink" href="#windows" title="Permalink to this heading">¶</a></h4>
+<p>(Currently untested in standalone-mode)</p>
+</section>
+</section>
+<section id="clone-the-repository">
+<h3><span class="section-number">4.3.2. </span>Clone the repository<a class="headerlink" href="#clone-the-repository" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/alexlancaster/pypop.git
+<span class="nb">cd</span><span class="w"> </span>pypop
+</pre></div>
+</div>
+</section>
+<section id="build-pypop">
+<h3><span class="section-number">4.3.3. </span>Build PyPop<a class="headerlink" href="#build-pypop" title="Permalink to this heading">¶</a></h3>
+<p>You should choose <em>either</em> of the following two approaches. Don’t try to
+mix-and-match the two. The build-and-install approach is recommended for
+end-users, or you if don’t plan to make any modifications to the code
+locally.</p>
+<section id="build-and-install-recommended-for-end-users">
+<h4>Build-and-install (recommended for end-users)<a class="headerlink" href="#build-and-install-recommended-for-end-users" title="Permalink to this heading">¶</a></h4>
+<p>Once you have setup your environment and cloned the repo, you can use
+the following one-liner to examine the <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> and pull all the
+required dependencies from <code class="docutils literal notranslate"><span class="pre">pypi.org</span></code> and build and install the
+package.</p>
+<blockquote>
+<div><p>Note that if you use this method and install the package, it will be
+available to run anywhere on your system, by running <code class="docutils literal notranslate"><span class="pre">pypop</span></code>.</p>
+</div></blockquote>
+<blockquote>
+<div><p>If you use this installation method, changes you make to the code,
+locally, or via subsequent <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code> requests will not be
+available in the installed version until you repeat the
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> command.</p>
+</div></blockquote>
+<ol class="arabic">
+<li><p>if you installed the conda development environment, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">.</span><span class="p">[</span><span class="n">test</span><span class="p">]</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>(the <code class="docutils literal notranslate"><span class="pre">[test]</span></code> keyword is included to make sure that any package
+requirements for the test suite are installed as well).</p>
+</div></blockquote>
+</li>
+<li><p>if you installed a system-wide environment, the process is slightly
+different, because we install into the user’s <code class="docutils literal notranslate"><span class="pre">$HOME/.local</span></code> rather
+than the conda environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="o">.</span><span class="p">[</span><span class="n">test</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>PyPop is ready-to-use, skip to <a class="reference internal" href="#run-the-test-suite">Run the test suite</a>.</p></li>
+<li><p>if you later decide you want to switch to using the developer
+approach, below, follow the <a href="#id1"><span class="problematic" id="id2">`Uninstalling PyPop and cleaning up`_</span></a> before
+starting.</p></li>
+</ol>
+</section>
+<section id="build-and-run-from-checkout-recommended-for-developers">
+<h4>Build-and-run-from-checkout (recommended for developers)<a class="headerlink" href="#build-and-run-from-checkout-recommended-for-developers" title="Permalink to this heading">¶</a></h4>
+<ol class="arabic">
+<li><p>First manually install the dependencies via <code class="docutils literal notranslate"><span class="pre">pip</span></code>, note that if you
+are running on Python &lt;= 3.8, you will need to also add
+<code class="docutils literal notranslate"><span class="pre">importlib-resources</span></code> to the list of packages, below.</p>
+<ol class="arabic">
+<li><p>conda</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">numpy</span> <span class="n">lxml</span> <span class="n">psutil</span> <span class="n">pytest</span>
+</pre></div>
+</div>
+</li>
+<li><p>system-wide</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">numpy</span> <span class="n">lxml</span> <span class="n">psutil</span> <span class="n">pytest</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</li>
+<li><p>Run the build</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span>
+</pre></div>
+</div>
+</li>
+<li><p>You will run PyPop, directly out of the <code class="docutils literal notranslate"><span class="pre">src/PyPop</span></code> subdirectory
+(e.g. <code class="docutils literal notranslate"><span class="pre">./src/PyPop/pypop.py</span></code>). Note that you have to include the
+<code class="docutils literal notranslate"><span class="pre">.py</span></code> extension when you run from an uninstalled checkout,
+because the script is not installed.</p></li>
+</ol>
+</section>
+</section>
+<section id="run-the-test-suite">
+<h3><span class="section-number">4.3.4. </span>Run the test suite<a class="headerlink" href="#run-the-test-suite" title="Permalink to this heading">¶</a></h3>
+<p>You should first check that the build worked, by running the test suite,
+via <code class="docutils literal notranslate"><span class="pre">pytest</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">tests</span>
+</pre></div>
+</div>
+<p>If you run into errors, please first carefully repeat and/or check your
+installation steps above. If you still get errors, file a bug (as per
+Support, below), and include the output of <code class="docutils literal notranslate"><span class="pre">pytest</span></code> run in verbose
+mode and capturing the output</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="o">-</span><span class="n">s</span> <span class="o">-</span><span class="n">v</span> <span class="n">tests</span>
+</pre></div>
+</div>
+<ol class="arabic">
+<li><p>Create a new environment with the <em>pypop</em> dependencies, <strong>only its dependencies</strong>, running the following 3 commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">raw</span><span class="o">.</span><span class="n">githubusercontent</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">alexlancaster</span><span class="o">/</span><span class="n">pypop</span><span class="o">/</span><span class="n">master</span><span class="o">/</span><span class="n">requirements</span><span class="o">-</span><span class="n">dev</span><span class="o">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">o</span> <span class="n">pypopdev</span><span class="o">.</span><span class="n">yml</span>
+<span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="n">pypopenv</span><span class="o">.</span><span class="n">yml</span>
+<span class="c1"># Activate the conda pypopdev environment</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">pypopdev</span>
+</pre></div>
+</div>
+</li>
+<li><p>Fork <a class="reference external" href="https://github.com/alexlancaster/pypop">pypop</a> (look for the “Fork” button on the top right corner of <a class="reference external" href="https://github.com/alexlancaster/pypop">our repository</a>).</p></li>
+<li><p><a class="reference external" href="https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository">Clone</a> your forked repository to your local machine:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">YOUR</span><span class="o">-</span><span class="n">USER</span><span class="o">-</span><span class="n">NAME</span><span class="o">/</span><span class="n">pypop</span><span class="o">.</span><span class="n">git</span> <span class="o">&lt;</span><span class="n">destination</span> <span class="n">folder</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Navigate to the fork folder and create a branch for local development:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">b</span> <span class="n">name</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">your</span><span class="o">-</span><span class="n">bugfix</span><span class="o">-</span><span class="ow">or</span><span class="o">-</span><span class="n">feature</span>
+</pre></div>
+</div>
+</li>
+<li><p>Install a development version of your development branch, remember to active the <code class="docutils literal notranslate"><span class="pre">pypopdev</span></code> environment beforehand:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">develop</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Now you can make your changes locally.</p>
+<ol class="arabic" start="6">
+<li><p>When you’re done making changes run all the checks and docs builder with <strong>pytest</strong> one command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span>
+</pre></div>
+</div>
+</li>
+<li><p>Commit your changes and push your branch to your <em>pypop fork</em> on GitHub:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">.</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;Your detailed description of your changes.&quot;</span>
+<span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">name</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">your</span><span class="o">-</span><span class="n">bugfix</span><span class="o">-</span><span class="ow">or</span><span class="o">-</span><span class="n">feature</span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request">Submit a pull request through the GitHub website</a>.</p></li>
+</ol>
+</section>
+<section id="pull-request-guidelines">
+<h3><span class="section-number">4.3.5. </span>Pull Request guidelines<a class="headerlink" href="#pull-request-guidelines" title="Permalink to this heading">¶</a></h3>
+<p>If you need some code review or feedback while you’re developing the code just make a pull request.</p>
+<p>For merging, you should:</p>
+<ol class="arabic simple">
+<li><p>Make sure your PR passes all <code class="docutils literal notranslate"><span class="pre">pytest</span></code> tests.</p></li>
+<li><p>Update documentation when there’s new API, functionality etc.</p></li>
+<li><p>Add a note to <code class="docutils literal notranslate"><span class="pre">NEWS.rst</span></code> about the changes.</p></li>
+<li><p>Add yourself to <code class="docutils literal notranslate"><span class="pre">website/docs/AUTHORS.rst</span></code>.</p></li>
+</ol>
+</section>
+</section>
+<section id="continuous-integration">
+<h2><span class="section-number">4.4. </span>Continuous integration<a class="headerlink" href="#continuous-integration" title="Permalink to this heading">¶</a></h2>
+<p>This project follows Continuous Integration (CI) good practices
+(let us know if something can be improved).</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+        <div id="show_right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents<span></a></p>
+        </div>
+
+        <div id="right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:<span></a></p>
+            <div class="page_toc">
+                <ul>
+<li><a class="reference internal" href="#">4. Contributing to PyPop</a><ul>
+<li><a class="reference internal" href="#reporting-and-requesting">4.1. Reporting and Requesting</a><ul>
+<li><a class="reference internal" href="#did-you-find-a-bug">4.1.1. Did you find a bug?</a></li>
+<li><a class="reference internal" href="#documentation-improvements">4.1.2. Documentation improvements</a></li>
+<li><a class="reference internal" href="#feature-requests-and-feedback">4.1.3. Feature requests and feedback</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#code-development">4.2. Code Development</a><ul>
+<li><a class="reference internal" href="#general-instructions">4.2.1. General instructions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation-for-developers">4.3. Installation for developers</a><ul>
+<li><a class="reference internal" href="#install-the-build-environment">4.3.1. Install the build environment</a><ul>
+<li><a class="reference internal" href="#install-build-environment-via-miniconda-recommended">Install build environment via miniconda (recommended)</a></li>
+<li><a class="reference internal" href="#install-build-environment-via-system-packages-advanced">Install build environment via system packages (advanced)</a><ul>
+<li><a class="reference internal" href="#unix-linux">Unix/Linux:</a></li>
+<li><a class="reference internal" href="#macos-x">MacOS X</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#windows">Windows</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#clone-the-repository">4.3.2. Clone the repository</a></li>
+<li><a class="reference internal" href="#build-pypop">4.3.3. Build PyPop</a><ul>
+<li><a class="reference internal" href="#build-and-install-recommended-for-end-users">Build-and-install (recommended for end-users)</a></li>
+<li><a class="reference internal" href="#build-and-run-from-checkout-recommended-for-developers">Build-and-run-from-checkout (recommended for developers)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#run-the-test-suite">4.3.4. Run the test suite</a></li>
+<li><a class="reference internal" href="#pull-request-guidelines">4.3.5. Pull Request guidelines</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#continuous-integration">4.4. Continuous integration</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+        </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+                <a href="guide-chapter-instructions.html">
+                    <span class="icon">&lt;</span><span><span class="section-number">3. </span>Interpreting PyPop output</span></a>
+                
+            </div>
+
+            <div class="right">
+                
+                    <a href="guide-chapter-install-obsolete.html"><span><span class="section-number">5. </span>Installation instructions for old 0.7.0 binaries</span><span class="icon">&gt;</span></a>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023 PyPop contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>
